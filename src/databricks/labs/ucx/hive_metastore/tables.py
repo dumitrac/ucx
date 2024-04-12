@@ -168,7 +168,13 @@ class Table:
         return f"SYNC TABLE {escape_sql_identifier(target_table_key)} FROM {escape_sql_identifier(self.key)};"
 
     def sql_migrate_external_hiveserde_in_place(
-        self, catalog_name, dst_schema, dst_table, backend: SqlBackend, hiveserde_in_place_migrate: str, uc_table_location: str | None=None
+        self,
+        catalog_name,
+        dst_schema,
+        dst_table,
+        backend: SqlBackend,
+        hiveserde_in_place_migrate: str,
+        uc_table_location: str | None = None,
     ) -> str | None:
         # extract hive serde info, ideally this should be done by table crawler.
         # But doing here to avoid breaking change to the `tables` table in the inventory schema.
