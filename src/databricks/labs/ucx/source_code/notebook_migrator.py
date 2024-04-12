@@ -3,20 +3,34 @@ from databricks.sdk.service.workspace import ExportFormat, ObjectInfo, ObjectTyp
 
 from databricks.labs.ucx.source_code.languages import Languages
 from databricks.labs.ucx.source_code.notebook import Notebook, RunCell
-from databricks.labs.ucx.source_code.dependencies import DependencyGraph, Dependency, DependencyLoader
+from databricks.labs.ucx.source_code.dependencies import (
+    DependencyGraph,
+    Dependency,
+    DependencyLoader,
+    DependencyResolver,
+)
 
 
 class NotebookMigrator:
-    def __init__(self, ws: WorkspaceClient, languages: Languages, loader: DependencyLoader):
+    def __init__(
+        self,
+        ws: WorkspaceClient,
+        languages: Languages,
+        loader: DependencyLoader,
+        resolver: DependencyResolver | None = None,
+    ):
         self._ws = ws
         self._languages = languages
         self._loader = loader
+        self._resolver = resolver
 
     def build_dependency_graph(self, object_info: ObjectInfo) -> DependencyGraph:
-        if not object_info.path or not object_info.language or object_info.object_type is not ObjectType.NOTEBOOK:
-            raise ValueError("Not a valid Notebook")
+        if not object_info.path or not object_info.object_type:
+            raise ValueError(f"Not a valid source of code: {object_info.path}")
+        if object_info.object_type is ObjectType.NOTEBOOK and not object_info.language:
+            raise ValueError(f"Not a valid notebook, missing default language: {object_info.path}")
         dependency = Dependency.from_object_info(object_info)
-        graph = DependencyGraph(dependency, None, self._loader)
+        graph = DependencyGraph(dependency, None, self._loader, self._resolver)
         container = self._loader.load_dependency(dependency)
         if container is not None:
             container.build_dependency_graph(graph)
