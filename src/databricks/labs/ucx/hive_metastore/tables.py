@@ -133,7 +133,7 @@ class Table:
         return False
 
     @property
-    def is_dbfs_mnt(self) -> bool:
+    def is_mount(self) -> bool:
         if not self.location:
             return False
         for dbfs_mnt_prefix in self.DBFS_ROOT_PREFIX_EXCEPTIONS:
