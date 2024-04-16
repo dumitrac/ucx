@@ -436,8 +436,11 @@ def test_migrate_external_tables_with_principal_acl_azure(
 ):
     if not ws.config.is_azure:
         pytest.skip("temporary: only works in azure test env")
-    table_migrate, table_full_name = prepared_principal_acl
+    ctx, table_full_name = prepared_principal_acl
     cluster = make_cluster(single_node=True, spark_conf=_SPARK_CONF, data_security_mode=DataSecurityMode.NONE)
+    ctx.with_dummy_azure_resource_permission()
+
+    table_migrate = ctx.tables_migrator
 
     user_with_cluster_access = make_user()
     user_without_cluster_access = make_user()
