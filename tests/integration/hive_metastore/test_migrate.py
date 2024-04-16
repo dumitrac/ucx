@@ -10,11 +10,6 @@ from databricks.sdk.service.iam import PermissionLevel
 
 from databricks.labs.ucx.hive_metastore.mapping import Rule
 from databricks.labs.ucx.hive_metastore.tables import AclMigrationWhat, Table, What
-from databricks.labs.ucx.hive_metastore.locations import (
-    ExternalLocation,
-    ExternalLocations,
-    Mount,
-)
 
 from ..conftest import (
     StaticTableMapping,
@@ -471,7 +466,7 @@ def test_migrate_external_tables_with_principal_acl_azure(
 
 
 @retried(on=[NotFound], timeout=timedelta(minutes=3))
-def test_migrate_managed_tables_with_principal_acl_aws(
+def test_migrate_external_tables_with_principal_acl_aws(
     ws, make_user, prepared_principal_acl, make_cluster_permissions, make_cluster, env_or_skip
 ):
     if not ws.config.is_aws:
@@ -499,5 +494,4 @@ def test_migrate_managed_tables_with_principal_acl_aws(
             match = True
             break
     assert match
-
 
